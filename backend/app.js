@@ -7,6 +7,22 @@ const mongoose = require("mongoose");
 
 require("dotenv").config();
 
+const mongoUri = process.env.MONGO_URI || process.env.MONGO_URL;
+const missingEnv = [];
+
+if (!mongoUri) {
+  missingEnv.push("MONGO_URI or MONGO_URL");
+}
+
+if (!process.env.JWT_SECRET) {
+  missingEnv.push("JWT_SECRET");
+}
+
+if (missingEnv.length > 0) {
+  console.error(`Missing required environment variable(s): ${missingEnv.join(", ")}`);
+  process.exit(1);
+}
+
 const app = express();
 
 // Middleware
@@ -35,12 +51,16 @@ const subAdminRoutes = require("./routes/subAdminRoutes");
 app.use("/api/subadmins", subAdminRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(mongoUri)
   .then(async () => {
     console.log("MongoDB connection successful");
 
     // Call Super Admin Seeder
     await seedSuperAdmin();
+
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   })
 .catch(err => { 
   console.error("MongoDB connection failed:", err); 
@@ -66,7 +86,3 @@ app.set("io", io);
 // Server
 // server.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
 const PORT = process.env.PORT || 8080;
-
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
