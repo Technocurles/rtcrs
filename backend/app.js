@@ -35,7 +35,7 @@ const subAdminRoutes = require("./routes/subAdminRoutes");
 app.use("/api/subadmins", subAdminRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log("MongoDB connection successful");
 
