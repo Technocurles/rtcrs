@@ -1,88 +1,80 @@
 const express = require("express");
 const http = require("http");
-const { initializeSocket } = require("./config/socket");
 const cors = require("cors");
-const seedSuperAdmin = require("./config/seedSuperAdmin");
 const mongoose = require("mongoose");
-
 require("dotenv").config();
 
-const mongoUri = process.env.MONGO_URI || process.env.MONGO_URL;
-const missingEnv = [];
+const { initializeSocket } = require("./config/socket");
+const seedSuperAdmin = require("./config/seedSuperAdmin");
 
-if (!mongoUri) {
-  missingEnv.push("MONGO_URI or MONGO_URL");
-}
-
-if (!process.env.JWT_SECRET) {
-  missingEnv.push("JWT_SECRET");
-}
-
-if (missingEnv.length > 0) {
-  console.error(`Missing required environment variable(s): ${missingEnv.join(", ")}`);
-  process.exit(1);
-}
-
+// ---------------- APP INIT ----------------
 const app = express();
 
-// Middleware
+// ---------------- MIDDLEWARE ----------------
 app.use(cors({
-    origin: "*",
-    credentials: true
+  origin: "*",
+  credentials: true
 }));
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
+// ---------------- ROUTES ----------------
 const userRoutes = require("./routes/userRoutes");
+const crimeRoutes = require("./routes/crimeRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const subAdminRoutes = require("./routes/subAdminRoutes");
+
 app.use("/api", userRoutes);
+app.use("/api/crime", crimeRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/subadmins", subAdminRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
-const crimeRoutes = require("./routes/crimeRoutes");
-app.use("/api/crime", crimeRoutes);
+// ---------------- HEALTH CHECK ROUTE ----------------
+app.get("/", (req, res) => {
+  res.status(200).send("Backend is LIVE 🚀");
+});
 
-const adminRoutes = require("./routes/adminRoutes");
-app.use("/api/admin", adminRoutes);
+// ---------------- ENV VALIDATION ----------------
+const mongoUri = process.env.MONGO_URI || process.env.MONGO_URL;
+const PORT = process.env.PORT;
 
-const subAdminRoutes = require("./routes/subAdminRoutes");
+if (!mongoUri) {
+  console.error("Missing MONGO_URI or MONGO_URL");
+  process.exit(1);
+}
 
-app.use("/api/subadmins", subAdminRoutes);
+if (!process.env.JWT_SECRET) {
+  console.error("Missing JWT_SECRET");
+  process.exit(1);
+}
 
-// MongoDB Connection
+if (!PORT) {
+  console.error("Missing PORT (Railway should provide this)");
+  process.exit(1);
+}
+
+// ---------------- CREATE SERVER ----------------
+const server = http.createServer(app);
+
+// ---------------- SOCKET INIT ----------------
+const io = initializeSocket(server);
+app.set("io", io);
+
+// ---------------- START SERVER AFTER DB ----------------
 mongoose.connect(mongoUri)
   .then(async () => {
     console.log("MongoDB connection successful");
 
-    // Call Super Admin Seeder
     await seedSuperAdmin();
 
     server.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
-.catch(err => { 
-  console.error("MongoDB connection failed:", err); 
-  process.exit(1); 
-});
-
-
-
-// Routes
-// app.get("/", (req, res) => res.send("Root is Working"));
-app.get("/", (req, res) => {
-  res.status(200).send("Backend is LIVE 🚀");
-});
-
-
-// Create HTTP server
-const server = http.createServer(app);
-
-// Initialize Socket.io and attach to app
-const io = initializeSocket(server);
-app.set("io", io);
-
-// Server
-// server.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
-const PORT = process.env.PORT || 8080;
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1);
+  });
