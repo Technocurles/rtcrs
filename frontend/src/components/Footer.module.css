@@ -1,0 +1,40 @@
+.footer {
+  background: linear-gradient(to bottom right, #2563ebcc, #1d4ed8cc, #1e40afcc) !important;
+  color: #f8fafc !important;
+  z-index: 10000 !important;
+  position: relative !important;
+  width: 100vw !important;
+  min-height: 260px !important;
+  left: 0 !important;
+  right: 0 !important;
+  box-shadow: 0 -4px 24px rgba(37, 99, 235, 0.3) !important;
+  padding: 1.5rem 0 1rem !important;
+}
+
+.footerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .footerContent {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+}
+
+.footerContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .footerContent {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+}
