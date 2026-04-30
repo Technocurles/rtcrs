@@ -10,14 +10,27 @@ const seedSuperAdmin = require("./config/seedSuperAdmin");
 // ---------------- APP INIT ----------------
 const app = express();
 
+// ---------------- TRUST PROXY (IMPORTANT FOR RAILWAY) ----------------
+app.set("trust proxy", 1);
+
 // ---------------- MIDDLEWARE ----------------
 app.use(cors({
   origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// ---------------- HEALTH CHECK (RAILWAY TEST) ----------------
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "RTCRS Backend is LIVE 🚀",
+    time: new Date().toISOString()
+  });
+});
 
 // ---------------- ROUTES ----------------
 const userRoutes = require("./routes/userRoutes");
@@ -32,49 +45,54 @@ app.use("/api/subadmins", subAdminRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
-// ---------------- HEALTH CHECK ROUTE ----------------
-app.get("/", (req, res) => {
-  res.status(200).send("Backend is LIVE 🚀");
-});
-
-// ---------------- ENV VALIDATION ----------------
+// ---------------- ENV ----------------
 const mongoUri = process.env.MONGO_URI || process.env.MONGO_URL;
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
+// ---------------- HARD CHECKS ----------------
 if (!mongoUri) {
-  console.error("Missing MONGO_URI or MONGO_URL");
+  console.error("❌ MongoDB URI missing");
   process.exit(1);
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error("Missing JWT_SECRET");
+  console.error("❌ JWT_SECRET missing");
   process.exit(1);
 }
 
-if (!PORT) {
-  console.error("Missing PORT (Railway should provide this)");
-  process.exit(1);
-}
-
-// ---------------- CREATE SERVER ----------------
+// ---------------- SERVER ----------------
 const server = http.createServer(app);
 
-// ---------------- SOCKET INIT ----------------
-const io = initializeSocket(server);
-app.set("io", io);
+// ---------------- SOCKET ----------------
+let io;
+try {
+  io = initializeSocket(server);
+  app.set("io", io);
+  console.log("✅ Socket initialized");
+} catch (err) {
+  console.error("⚠️ Socket init failed:", err.message);
+}
 
-// ---------------- START SERVER AFTER DB ----------------
-mongoose.connect(mongoUri)
-  .then(async () => {
-    console.log("MongoDB connection successful");
+// ---------------- START FUNCTION ----------------
+const startServer = async () => {
+  try {
+    console.log("⏳ Connecting to MongoDB...");
+
+    await mongoose.connect(mongoUri);
+
+    console.log("✅ MongoDB connected");
 
     await seedSuperAdmin();
+    console.log("✅ Super admin seeded");
 
     server.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on PORT: ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
+
+  } catch (err) {
+    console.error("❌ Startup error:", err);
     process.exit(1);
-  });
+  }
+};
+
+startServer();
