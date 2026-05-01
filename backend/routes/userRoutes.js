@@ -4,7 +4,8 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 require("dotenv").config();
 const path = require("path");
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -27,16 +28,12 @@ if (!process.env.JWT_SECRET) {
 //     pass: process.env.EMAIL_PASS,
 //   },
 // });
+const client = SibApiV3Sdk.ApiClient.instance;
+const apiKey = client.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // TLS
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
 
 
 // ================= REGISTER =================
@@ -132,12 +129,14 @@ router.post("/forgot-password", async (req, res) => {
     user.otpExpiry = Date.now() + 5 * 60 * 1000;
     await user.save();
 
-    await transporter.sendMail({
-  from: `"Janrakshak Security" <${process.env.EMAIL}>`,
-  to: email,
-  replyTo: "no-reply@janrakshak.com",
+    await emailApi.sendTransacEmail({
+      sender: {
+    email: process.env.EMAIL,
+    name: "Janrakshak Security",
+  },
+  to: [{ email: email }],
   subject: "🔐 Reset Your Password - Janrakshak",
-  html: `
+  htmlContent: `
   <div style="margin:0;padding:0;background-color:#f4f6f9;font-family:Arial,sans-serif;">
     <table align="center" width="100%" cellpadding="0" cellspacing="0" style="padding:30px 0;">
       <tr>
