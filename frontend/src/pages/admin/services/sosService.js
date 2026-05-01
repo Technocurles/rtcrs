@@ -1,7 +1,8 @@
 
 import axios from "axios";
+import API from "../../../config/api";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
+const API_URL = `${API}/api`;
 
 // Get token from localStorage (checks both admin and sub-admin tokens)
 // CRITICAL FIX: Use sessionStorage for sub-admin tokens to prevent cross-tab pollution

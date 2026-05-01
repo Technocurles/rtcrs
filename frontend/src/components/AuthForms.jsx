@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import API from "../config/api";
 
 export default function AuthForms() {
   const navigate = useNavigate();
-  const API = "http://localhost:8080";
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

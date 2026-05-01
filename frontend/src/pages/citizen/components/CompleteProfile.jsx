@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../../config/api";
 
 function CompleteProfile() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ function CompleteProfile() {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        const res = await axios.get("http://localhost:8080/api/profile", {
+        const res = await axios.get(`${API}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -117,7 +118,7 @@ function CompleteProfile() {
 
       const token = localStorage.getItem("token");
 
-      await axios.put("http://localhost:8080/api/complete-profile", data, {
+      await axios.put(`${API}/api/complete-profile`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
 

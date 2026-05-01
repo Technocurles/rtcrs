@@ -1,8 +1,9 @@
 import axios from "axios";
+import API_BASE from "../../../config/api";
 
-const API = "http://localhost:8080/api/subadmins"; 
-const USER_API = "http://localhost:8080/api";
-const ADMIN_API = "http://localhost:8080/api/admin";
+const API = `${API_BASE}/api/subadmins`;
+const USER_API = `${API_BASE}/api`;
+const ADMIN_API = `${API_BASE}/api/admin`;
 
 // ======================
 // Get Current Admin Info

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API from "../../config/api";
 
 export default function SubAdminLogin() {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ export default function SubAdminLogin() {
       // Quick token check first
       const verifyToken = async () => {
         try {
-          const API = process.env.REACT_APP_API_URL || "http://localhost:8080";
           const res = await axios.get(`${API}/api/admin/me`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -59,8 +59,6 @@ export default function SubAdminLogin() {
 
     try {
       setLoading(true);
-
-      const API = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
       const res = await axios.post(`${API}/api/admin/login`, {
         email: trimmedEmail,

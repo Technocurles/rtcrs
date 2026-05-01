@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import adminService from "../services/adminService";
+import API from "../../../config/api";
 
 const citiesByDivision = {
   "North Gujarat": ["Banaskantha", "Patan", "Mehsana", "Sabarkantha", "Aravalli", "Gandhinagar"],
@@ -109,7 +110,7 @@ export default function AddAdmin({ setActiveTab, preselectedCity }) {
     };
 
     try {
-      const response = await axios.post("http://localhost:8080/api/admin/create", payload);
+      const response = await axios.post(`${API}/api/admin/create`, payload);
       const createdEmail = response.data?.admin?.email || "Auto-generated";
 
       alert(

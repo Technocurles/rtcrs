@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { User, Mail, Phone, MapPin, Calendar, Shield, Edit2, Camera } from "lucide-react";
+import API from "../../../config/api";
 
 export default function MyProfile() {
   const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ export default function MyProfile() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/api/profile", {
+      const res = await axios.get(`${API}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data);
@@ -54,7 +55,7 @@ export default function MyProfile() {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.put("http://localhost:8080/api/profile", formData, {
+      await axios.put(`${API}/api/profile`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage({ type: "success", text: "Profile updated successfully!" });

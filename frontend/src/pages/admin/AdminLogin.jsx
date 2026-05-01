@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../config/api";
 
 function AdminLogin() {
   const [role, setRole] = useState("super_admin");
@@ -36,7 +37,7 @@ function AdminLogin() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/admin/login",
+        `${API}/api/admin/login`,
         { email, password, role }
       );
 

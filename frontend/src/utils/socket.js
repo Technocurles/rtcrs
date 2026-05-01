@@ -2,9 +2,10 @@
 
 
 import { io } from "socket.io-client";
+import API from "../config/api";
 
 // Connect to backend socket server
-const SOCKET_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+const SOCKET_URL = API;
 
 // CRITICAL FIX: Use sessionStorage to track tab-specific socket
 // Each tab has its own unique socket ID stored in sessionStorage

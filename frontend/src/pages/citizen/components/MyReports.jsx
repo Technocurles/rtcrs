@@ -4,6 +4,7 @@ import axios from "axios";
 import { onCrimeStatusUpdate, removeStatusUpdateListener } from "../../../utils/socket";
 import { getMySOSAlerts } from "../../admin/services/sosService";
 import { getPriorityLabel, getPriorityStyle, normalizePriority } from "../../../utils/priorityStyles";
+import API from "../../../config/api";
 
 export default function MyReports() {
   const [reports, setReports] = useState([]);
@@ -56,7 +57,7 @@ export default function MyReports() {
         return;
       }
       
-      const response = await axios.get("/api/crime/my-reports", {
+      const response = await axios.get(`${API}/api/crime/my-reports`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

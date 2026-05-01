@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
+import API from "../../../config/api";
 
 export default function ReportCrime() {
   const [formData, setFormData] = useState({
@@ -304,7 +305,7 @@ export default function ReportCrime() {
 
       const token = sessionStorage.getItem("token") || localStorage.getItem("token");
       
-      const response = await fetch("/api/crime/report", {
+      const response = await fetch(`${API}/api/crime/report`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`

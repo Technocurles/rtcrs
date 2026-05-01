@@ -11,6 +11,7 @@ import Settings from "./components/Settings";
 import { initializeSocket, onSOSStatusUpdate, disconnectSocket } from "../../utils/socket";
 import { createSOSAlert } from "../admin/services/sosService";
 import { areaCoordinates } from "../../utils/areaCoordinates";
+import API from "../../config/api";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -42,7 +43,7 @@ export default function Dashboard() {
           return;
         }
 
-        const res = await axios.get("http://localhost:8080/api/profile", {
+        const res = await axios.get(`${API}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

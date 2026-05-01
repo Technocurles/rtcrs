@@ -1,6 +1,7 @@
 import axios from "axios";
+import API from "../../../config/api";
 
-const API_URL = "/api/crime";
+const API_URL = `${API}/api/crime`;
 
 // Get token from localStorage (checks both admin and sub-admin tokens)
 // CRITICAL FIX: Use sessionStorage for sub-admin tokens to prevent cross-tab pollution

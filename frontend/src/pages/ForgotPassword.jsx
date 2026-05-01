@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Player } from "@lottiefiles/react-lottie-player";
+import API from "../config/api";
 import passwordAnimation from "../assets/password.json"; // ✅ Lottie JSON version of your animation
 
 function ForgotPassword() {
@@ -46,7 +47,7 @@ function ForgotPassword() {
   const handleGenerateOtp = async () => {
     if (!email) return alert("Please enter your email");
     try {
-      const res = await fetch("http://localhost:8080/api/forgot-password", {
+      const res = await fetch(`${API}/api/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -70,7 +71,7 @@ function ForgotPassword() {
     if (passwordStrength < 5) return alert("Password is not strong enough");
 
     try {
-      const res = await fetch("http://localhost:8080/api/reset-password", {
+      const res = await fetch(`${API}/api/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword: password }),

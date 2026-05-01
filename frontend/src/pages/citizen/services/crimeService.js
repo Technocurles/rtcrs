@@ -1,4 +1,5 @@
 import axios from 'axios';
+import API from '../../../config/api';
 
 const citizenToken = () =>
   sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -10,7 +11,7 @@ const citizenHeaders = () => ({
 // Get citizen's own reports
 export const getMyReports = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/my-reports', citizenHeaders());
+    const response = await axios.get(`${API}/api/my-reports`, citizenHeaders());
     return response.data;
   } catch (error) {
     throw error;
@@ -21,7 +22,7 @@ export const getMyReports = async () => {
 export const getMyCrimeStats = async () => {
   try {
     const response = await axios.get(
-      'http://localhost:8080/api/crime/my-reports/stats',
+      `${API}/api/crime/my-reports/stats`,
       citizenHeaders()
     );
     return response.data;
@@ -46,14 +47,14 @@ export const getMyCrimeStats = async () => {
 export const getMySOSCount = async () => {
   try {
     const primaryResponse = await axios.get(
-      'http://localhost:8080/api/crime/sos/me/count',
+      `${API}/api/crime/sos/me/count`,
       citizenHeaders()
     );
     return primaryResponse.data;
   } catch (error) {
     try {
       const fallbackResponse = await axios.get(
-        'http://localhost:8080/api/crime/sos/my-count',
+        `${API}/api/crime/sos/my-count`,
         citizenHeaders()
       );
       return fallbackResponse.data;

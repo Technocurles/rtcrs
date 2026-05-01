@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CompleteProfile from "./components/CompleteProfile";
+import API from "../../config/api";
 
 export default function CompleteProfilePage() {
   const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ export default function CompleteProfilePage() {
           return;
         }
 
-        const res = await axios.get("http://localhost:8080/api/profile", {
+        const res = await axios.get(`${API}/api/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

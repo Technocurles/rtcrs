@@ -2,7 +2,6 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8080",
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@tailwindcss/postcss7-compat": "^2.2.17",

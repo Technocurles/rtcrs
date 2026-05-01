@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../../../config/api";
 
 export default function ProfileManagement() {
   const [user, setUser] = useState(null);
@@ -13,7 +14,7 @@ export default function ProfileManagement() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:8080/api/profile",
+        `${API}/api/profile`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
