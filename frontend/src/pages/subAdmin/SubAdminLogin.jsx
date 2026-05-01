@@ -53,7 +53,7 @@ export default function SubAdminLogin() {
     if (!trimmedEmail || !password.trim()) {
       return setError("All fields are required");
     }
-    if (!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(trimmedEmail)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       return setError("Please enter a valid email");
     }
 
