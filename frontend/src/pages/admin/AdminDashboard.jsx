@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import UserManagement from "./components/UserManagement";
@@ -15,6 +15,7 @@ import { initializeSocket, onNewSOSAlert, disconnectSocket } from "../../utils/s
 import SOSAlerts from "../subAdmin/components/SOSAlerts";
 import StatsCards from "./components/StatsCards";
 import { matchesPriority } from "../../utils/priorityStyles";
+import { playSOSAlertSound, unlockSOSAlertSound } from "../../utils/sosAlertSound";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -33,45 +34,21 @@ export default function AdminDashboard() {
   const [showSOSNotification, setShowSOSNotification] = useState(false);
   const [latestSOS, setLatestSOS] = useState(null);
 
-  // Audio ref for emergency sound
-  const audioRef = useRef(null);
-
   // Fetch all reports for map view (only for super admin)
   const adminRole = localStorage.getItem("adminRole");
   const adminToken = localStorage.getItem("adminToken");
   const adminName = localStorage.getItem("adminName") || "Super Admin";
 
-  // Initialize audio for emergency sound
+  // Prepare SOS alert audio after the first user interaction so browsers allow playback.
   useEffect(() => {
-    const playEmergencySound = () => {
-      try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const unlock = () => unlockSOSAlertSound();
+    window.addEventListener("pointerdown", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
 
-        // Create pulsing beep sound
-        let count = 0;
-        const interval = setInterval(() => {
-          count++;
-          if (count >= 3) {
-            clearInterval(interval);
-            return;
-          }
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.frequency.value = 800;
-          oscillator.type = 'sine';
-          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-          gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
-          oscillator.start(audioContext.currentTime);
-          oscillator.stop(audioContext.currentTime + 0.3);
-        }, 400);
-      } catch (e) {
-        console.log("Audio not supported");
-      }
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
     };
-
-    audioRef.current = playEmergencySound;
   }, []);
 
   // Initialize socket for real-time SOS alerts
@@ -102,10 +79,7 @@ export default function AdminDashboard() {
             setLatestSOS(newAlert);
             setShowSOSNotification(true);
 
-            // Play emergency sound
-            if (audioRef.current) {
-              audioRef.current();
-            }
+            playSOSAlertSound();
           }
         });
       } catch (err) {
