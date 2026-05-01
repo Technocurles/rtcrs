@@ -110,7 +110,12 @@ export default function AddAdmin({ setActiveTab, preselectedCity }) {
     };
 
     try {
-      const response = await axios.post(`${API}/api/admin/create`, payload);
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.post(`${API}/api/admin/create`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const createdEmail = response.data?.admin?.email || "Auto-generated";
 
       alert(

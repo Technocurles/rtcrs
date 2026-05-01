@@ -65,6 +65,10 @@ export default function SubAdminLogin() {
         password: password.trim(),
       });
 
+      if (res.data.role !== "sub_admin") {
+        return setError("This account is not a sub-admin account");
+      }
+
       // CRITICAL FIX: Use sessionStorage instead of localStorage for the token
       // sessionStorage is tab-specific (each tab has its own), so when a user logs in
       // in one tab, it won't overwrite the token in other tabs

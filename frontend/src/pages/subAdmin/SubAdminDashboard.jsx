@@ -108,12 +108,10 @@ export default function SubAdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("subAdminToken");
-
-    if (!token) {
+    if (!adminToken) {
       navigate("/subadmin/login", { replace: true });
     }
-  }, [navigate]);
+  }, [adminToken, navigate]);
 
   // CRITICAL FIX: Fetch admin info from API on mount to get tab-specific city
   // This prevents cross-tab city switching because each tab has its own JWT token
@@ -127,6 +125,7 @@ export default function SubAdminDashboard() {
       } catch (err) {
         console.error("Error fetching admin info:", err);
         // If error, redirect to login
+        sessionStorage.removeItem("subAdminToken");
         localStorage.removeItem("subAdminToken");
         navigate("/subadmin/login", { replace: true });
       } finally {
@@ -335,6 +334,7 @@ export default function SubAdminDashboard() {
       // Check for token expiration or invalid token
       if (err.response?.status === 401 || err.message?.includes("Invalid or expired token")) {
         // Token is invalid or expired, redirect to login
+        sessionStorage.removeItem("subAdminToken");
         localStorage.removeItem("subAdminToken");
         setError("Session expired. Please login again.");
         setTimeout(() => {

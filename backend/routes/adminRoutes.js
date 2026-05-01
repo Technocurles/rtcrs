@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const adminAuth = require("../middlewares/adminAuth");
+const authorizeRoles = require("../middlewares/roleMiddleware");
 
 
 // ======================
@@ -40,7 +41,7 @@ router.get("/me", adminAuth, async (req, res) => {
 // ======================
 // CREATE SUB ADMIN (Only Super Admin Should Use This Route)
 // ======================
-router.post("/create", async (req, res) => {
+router.post("/create", adminAuth, authorizeRoles("super_admin"), async (req, res) => {
   try {
     const {
       name,
@@ -50,10 +51,13 @@ router.post("/create", async (req, res) => {
       role,
       state,
       city,
-      officerId
+      officerId,
+      isActive
     } = req.body;
 
-    if (!name || !email || !password || !role) {
+    const normalizedEmail = email?.trim().toLowerCase();
+
+    if (!name || !normalizedEmail || !password || !role) {
       return res.status(400).json({
         message: "Name, email, password and role are required"
       });
@@ -65,7 +69,13 @@ router.post("/create", async (req, res) => {
       });
     }
 
-    const existingAdmin = await Admin.findOne({ email });
+    if (role === "sub_admin" && !city) {
+      return res.status(400).json({
+        message: "City is required for sub admin"
+      });
+    }
+
+    const existingAdmin = await Admin.findOne({ email: normalizedEmail });
     if (existingAdmin) {
       return res.status(400).json({
         message: "Email already registered"
@@ -93,7 +103,7 @@ router.post("/create", async (req, res) => {
       city: role === "sub_admin" ? city : null,
       officerId,
       isFirstLogin: role === "sub_admin" ? true : false, // 🔥 Super admin skips activation
-      isActive: true
+      isActive: typeof isActive === "boolean" ? isActive : true
     });
 
     await newAdmin.save();
@@ -122,14 +132,15 @@ router.post("/login", async (req, res) => {
   try {
 
     const { email, password } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({
         message: "Email and password required"
       });
     }
 
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ email: normalizedEmail });
 
     if (!admin) {
       return res.status(400).json({
