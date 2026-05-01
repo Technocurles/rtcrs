@@ -29,12 +29,12 @@ if (!process.env.JWT_SECRET) {
 // });
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: "smtp-relay.brevo.com",
   port: 587,
   secure: false, // TLS
   auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
