@@ -23,6 +23,18 @@ This project was built to demonstrate practical full-stack development, real-tim
 - Real-time updates using Socket.IO
 - Responsive React frontend
 
+
+## 🚀 Demo Video
+
+[![Watch the demo](https://img.youtube.com/vi/gwJ73AZHs8Q/0.jpg)](https://www.youtube.com/watch?v=gwJ73AZHs8Q)
+
+## ✨ Features
+- 📍 Live incident reporting
+- 🚨 SOS alert system
+- 👮 Admin & Sub-admin dashboards
+- 🗺️ Real-time map tracking
+- 🔐 Secure authentication
+
 ## Tech Stack
 
 ### Frontend
@@ -100,4 +112,6 @@ rtcrs/
 ├── .gitignore
 ├── package.json
 └── README.md
+
+
 
