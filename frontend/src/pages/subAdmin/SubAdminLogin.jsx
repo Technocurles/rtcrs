@@ -13,37 +13,22 @@ export default function SubAdminLogin() {
 
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // Auto redirect if already logged in
+// CRITICAL: Clear any existing subadmin sessions on mount to prevent unauthorized access
+  // This ensures a clean login state and prevents using old tokens from previous sessions
   useEffect(() => {
-    const token = sessionStorage.getItem("subAdminToken") || localStorage.getItem("subAdminToken");
-    if (token) {
-      // Quick token check first
-      const verifyToken = async () => {
-        try {
-          const res = await axios.get(`${API}/api/admin/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (res.data.role === "sub_admin") {
-            window.dispatchEvent(new Event('subadmin-logged-in'));
-            navigate("/subadmin/dashboard", { replace: true });
-          } else {
-            // Clear invalid token
-            sessionStorage.removeItem("subAdminToken");
-            localStorage.removeItem("subAdminToken");
-          }
-        } catch (err) {
-          // Invalid token - clear it
-          sessionStorage.removeItem("subAdminToken");
-          localStorage.removeItem("subAdminToken");
-        } finally {
-          setCheckingAuth(false);
-        }
-      };
-      verifyToken();
-    } else {
-      setCheckingAuth(false);
-    }
-  }, [navigate]);
+    // Clear ALL admin-related storage to ensure clean authentication
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminRole");
+    localStorage.removeItem("adminCity");
+    localStorage.removeItem("adminName");
+    sessionStorage.removeItem("subAdminToken");
+    localStorage.removeItem("subAdminToken");
+    localStorage.removeItem("subAdminId");
+    
+    // Mark checking as complete - do NOT auto-redirect
+    // Users must explicitly login with credentials
+    setCheckingAuth(false);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

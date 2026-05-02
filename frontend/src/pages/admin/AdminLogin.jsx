@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import API from "../../config/api";
 
 function AdminLogin() {
-  const [role, setRole] = useState("super_admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -12,6 +11,19 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  // CRITICAL: Clear any existing admin sessions on mount to prevent unauthorized access
+  // This ensures a clean login state and prevents using old tokens from previous sessions
+  useEffect(() => {
+    // Clear all admin-related storage to ensure clean authentication
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminRole");
+    localStorage.removeItem("adminCity");
+    localStorage.removeItem("adminName");
+    sessionStorage.removeItem("subAdminToken");
+    localStorage.removeItem("subAdminToken");
+    localStorage.removeItem("subAdminId");
+  }, []);
 
   // Real-time validation for Super Admin
   useEffect(() => {
@@ -35,10 +47,12 @@ function AdminLogin() {
 
     setLoading(true);
 
-    try {
+try {
+      // Hardcoded for super admin login
+      const loginRole = "super_admin";
       const res = await axios.post(
         `${API}/api/admin/login`,
-        { email, password, role }
+        { email, password, role: loginRole }
       );
 
       localStorage.setItem("adminToken", res.data.token);

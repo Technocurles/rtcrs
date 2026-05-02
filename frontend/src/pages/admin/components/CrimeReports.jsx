@@ -40,7 +40,8 @@ export default function CrimeReports() {
     }
   };
 
-  // Initialize socket and fetch reports
+// Initialize socket and fetch reports
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchReports();
 
@@ -192,21 +193,11 @@ export default function CrimeReports() {
     }
   };
 
-  // Handle "View More" from map popup
+// Handle "View More" from map popup
   const handleViewMore = useCallback((report) => {
     setSelectedReport(report);
     setActiveTab("table");
   }, []);
-
-  // Helper function to determine file type from URL
-  const getFileTypeFromUrl = (url) => {
-    if (!url) return 'unknown';
-    const lowerUrl = url.toLowerCase();
-    if (lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) return 'image';
-    if (lowerUrl.match(/\.(mp4|webm|mov|avi)$/)) return 'video';
-    if (lowerUrl.match(/\.(mp3|wav|ogg|m4a)$/)) return 'audio';
-    return 'unknown';
-  };
 
   return (
     <div className="p-6">

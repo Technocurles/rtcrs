@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -33,11 +33,8 @@ export default function Sidebar({ setActiveTab, sidebarOpen, setSidebarOpen, sos
     return adminCity ? `Admin ${adminCity}` : "Admin";
   };
 
-  // Calculate active SOS count
+// Calculate active SOS count
   const activeSOSCount = sosAlerts ? sosAlerts.filter(a => a.status === "active").length : 0;
-  
-  // Calculate total SOS count
-  const totalSOSCount = sosAlerts ? sosAlerts.length : 0;
 
   const handleLogout = () => {
     localStorage.removeItem("token");

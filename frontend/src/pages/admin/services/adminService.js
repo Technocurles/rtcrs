@@ -16,8 +16,8 @@ export const getCurrentAdmin = async () => {
   try {
     // Try sessionStorage first (tab-specific), fall back to localStorage
     const token = sessionStorage.getItem("subAdminToken") || localStorage.getItem("subAdminToken");
-    if (!token) {
-      throw { message: "No authentication token found", status: 401 };
+if (!token) {
+      throw new Error("No authentication token found");
     }
     
     const response = await axios.get(`${ADMIN_API}/me`, {
@@ -36,7 +36,7 @@ export const getCurrentAdmin = async () => {
 const getSubAdminAuthHeader = () => {
   const token = sessionStorage.getItem("subAdminToken") || localStorage.getItem("subAdminToken");
   if (!token) {
-    throw { message: "No sub-admin token found", status: 401 };
+    throw new Error("No sub-admin token found");
   }
   return {
     headers: {
@@ -49,7 +49,7 @@ const getSubAdminAuthHeader = () => {
 const getSuperAdminAuthHeader = () => {
   const token = localStorage.getItem("adminToken");
   if (!token) {
-    throw { message: "No admin token found", status: 401 };
+    throw new Error("No admin token found");
   }
   return {
     headers: {

@@ -4,21 +4,6 @@ import API from "../../../config/api";
 
 const API_URL = `${API}/api`;
 
-// Get token from localStorage (checks both admin and sub-admin tokens)
-// CRITICAL FIX: Use sessionStorage for sub-admin tokens to prevent cross-tab pollution
-const getAuthHeader = () => {
-  // Check for adminToken first, then subAdminToken from sessionStorage (tab-specific)
-  const token = localStorage.getItem("adminToken") || sessionStorage.getItem("subAdminToken") || localStorage.getItem("subAdminToken");
-  if (!token) {
-    throw new Error("No authentication token found");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
-
 // Create axios instance
 const axiosInstance = axios.create({
   baseURL: API_URL,

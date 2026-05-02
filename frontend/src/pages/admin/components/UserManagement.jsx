@@ -1,4 +1,4 @@
-import { ShieldPlus, Shield, Users } from "lucide-react";
+import { ShieldPlus, Shield } from "lucide-react";
 
 export default function UserManagement({ setActiveTab }) {
 
