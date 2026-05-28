@@ -1358,4 +1358,3 @@ const SOSResponsePanel = ({ sos, onDispatchTeam, onStatusUpdate, onClose }) => {
     </div>
   );
 };
-

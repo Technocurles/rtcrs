@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -17,8 +17,13 @@ import {
 import { useNavigate } from "react-router-dom";
 
 
-export default function Sidebar({ setActiveTab, sidebarOpen, setSidebarOpen, sosAlerts = [] }) {
-  const [active, setActive] = useState("dashboard");
+export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen, sosAlerts = [] }) {
+  const [active, setActive] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('superAdminActiveTab') || 'dashboard';
+    }
+    return 'dashboard';
+  });
   const navigate = useNavigate();
 
   // Get admin role and city from localStorage
@@ -54,9 +59,17 @@ export default function Sidebar({ setActiveTab, sidebarOpen, setSidebarOpen, sos
   ];
 
   // Close sidebar when clicking a menu item on mobile
+  // Sync local active state with parent activeTab prop
+  useEffect(() => {
+    if (activeTab && activeTab !== active) {
+      setActive(activeTab);
+    }
+  }, [activeTab]);
+
   const handleMenuClick = (id) => {
     setActive(id);
     setActiveTab(id);
+    sessionStorage.setItem('superAdminActiveTab', id); // Persist tab selection
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
     }
@@ -168,10 +181,10 @@ export default function Sidebar({ setActiveTab, sidebarOpen, setSidebarOpen, sos
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white truncate">
-                  {adminRole === "super_admin" ? "Super Admin" : adminCity ? `Admin ${adminCity}` : "Admin"}
+                  {adminRole === "super_admin" ? "Super Admin" : adminCity ? `Admin ${adminCity}` : "Super Admin"}
                 </p>
                 <p className="text-xs text-white/60 truncate">
-                  {adminRole === "super_admin" ? "Gujarat State" : adminCity || "Unknown City"}
+                  {adminRole === "super_admin" ? "Gujarat State" : adminCity || "Gujarat State"}
                 </p>
               </div>
             </div>

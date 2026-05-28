@@ -219,11 +219,16 @@ function Home() {
   
 
   return (
-    <div className="relative bg-gray-50">
-      <HeroSection />
-      <FeaturesSection />
-      <RegisterGuideSection />
-      <HowJanRakshakWorks />
+    <div className="relative bg-gray-50 overflow-x-hidden">
+      <main className="px-3 sm:px-6 lg:px-12">
+        <HeroSection />
+        <FeaturesSection />
+        <RegisterGuideSection />
+        <HowJanRakshakWorks />
+      </main>
+
+
+
 
       {/* Global styles for SOS modal - forces Leaflet to be behind modal */}
       <style>{`
@@ -263,11 +268,12 @@ function Home() {
         >
           {/* Modal Container */}
           <div 
-            className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fade-in"
+            className="bg-white rounded-xl shadow-2xl max-w-[calc(100vw-2rem)] w-full sm:max-w-md p-5 sm:p-6 animate-fade-in"
             style={{ position: 'relative', zIndex: 999999 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
+
               {/* Warning Icon */}
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🚨</span>
@@ -352,9 +358,10 @@ function Home() {
           }}
         >
           <div 
-            className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 text-center animate-fade-in"
+            className="bg-white rounded-xl shadow-2xl max-w-[calc(100vw-2rem)] w-full sm:max-w-md p-6 sm:p-8 text-center animate-fade-in"
             style={{ position: 'relative', zIndex: 999999 }}
           >
+
             {/* Success Icon */}
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">✅</span>
@@ -382,15 +389,16 @@ function Home() {
       <button
         id="sos-floating-button"
         onClick={handleSOSClick}
-        className="fixed bottom-8 right-8 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-[9998] flex items-center gap-2 animate-pulse"
+        className="fixed bottom-8 right-8 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 sm:py-3 sm:px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-[9998] flex items-center gap-2 animate-pulse"
         style={{
           boxShadow: '0 4px 20px rgba(220, 38, 38, 0.5)'
         }}
       >
 
-        <span className="text-xl">🚨</span>
-        <span className="text-lg">SOS</span>
+        <span className="text-xl sm:text-lg">🚨</span>
+        <span className="text-lg hidden sm:inline">SOS</span>
       </button>
+
 
     </div>
   );

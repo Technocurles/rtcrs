@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -282,11 +282,13 @@ const MapBounds = ({ selectedCity }) => {
 export default function GujaratCrimeMap({ 
   reports = [], 
   sosAlerts = [],
+  refreshKey = 0,
   onViewMore,
   onMarkerClick,
   onSOSAlertReceived,
   selectedCity = "all"
 }) {
+  const mapRef = useRef(null);
   const [mounted, setMounted] = useState(false);
   const [gujaratGeo, setGujaratGeo] = useState(null);
   const [districtGeo, setDistrictGeo] = useState(null);
@@ -328,6 +330,17 @@ export default function GujaratCrimeMap({
       .then((res) => setDistrictGeo(res.data))
       .catch((err) => console.error("District GeoJSON load error:", err));
   }, []);
+
+  // 🔥 FIX: Invalidate map size on tab switch/refresh
+  useEffect(() => {
+    if (mapRef.current) {
+      // Small delay to ensure DOM/DOMRect updated after tab switch
+      setTimeout(() => {
+        mapRef.current.invalidateSize({ pan: true });
+        console.log('🗺️ Map invalidated on refreshKey:', refreshKey);
+      }, 150);
+    }
+  }, [refreshKey]);
   
   // Filter reports by selected city
   const filteredReports = useMemo(() => {
@@ -457,6 +470,7 @@ export default function GujaratCrimeMap({
       
       <div style={{ height: "550px", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
         <MapContainer
+          ref={mapRef}
           center={[22.2587, 71.1924]}
           zoom={7}
           minZoom={6}

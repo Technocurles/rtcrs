@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import UserManagement from "./components/UserManagement";
@@ -18,7 +18,13 @@ import { matchesPriority } from "../../utils/priorityStyles";
 import { playSOSAlertSound, unlockSOSAlertSound } from "../../utils/sosAlertSound";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  // Load persisted tab state (sessionStorage - tab specific)
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('superAdminActiveTab') || 'dashboard';
+    }
+    return 'dashboard';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [allReports, setAllReports] = useState([]);
   const [sosAlerts, setSOSAlerts] = useState([]);
@@ -26,6 +32,7 @@ export default function AdminDashboard() {
   const [dashboardStats, setDashboardStats] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
   const [preselectedCity, setPreselectedCity] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // City filter for stats and map
   const [selectedCity, setSelectedCity] = useState("all");
@@ -91,6 +98,45 @@ export default function AdminDashboard() {
       disconnectSocket();
     };
   }, [adminToken, adminRole]);
+
+  // 🔥 FIXED: Tab switch refresh - only current tab data
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && adminRole === "super_admin") {
+        console.log(`Tab focused - refreshing ${activeTab} data`);
+        setRefreshKey(prev => prev + 1);
+        
+        // Refresh common data
+        fetchAllReports();
+        
+        // Tab-specific refresh
+        switch(activeTab) {
+          case 'map':
+            fetchSOSAlertsForMap();
+            break;
+          case 'sos':
+            fetchSOSAlerts(true);
+            break;
+          case 'dashboard':
+            fetchDashboardStats();
+            break;
+          case 'reports':
+          case 'users':
+          case 'citizens':
+            // Other tabs handle own refresh via refreshKey remount
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
+  }, [adminRole, activeTab]);
 
   useEffect(() => {
     if (adminRole === "super_admin") {
@@ -280,7 +326,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
-      <Sidebar
+<Sidebar
+        key={`sidebar-${refreshKey}`}
+        activeTab={activeTab}
         setActiveTab={setActiveTab}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -431,6 +479,7 @@ export default function AdminDashboard() {
                 <p className="text-gray-500">View and manage all SOS alerts across all cities</p>
               </div>
               <SOSAlerts
+                key={`sos-${refreshKey}`}
                 sosAlerts={sosAlerts}
                 adminCity={null} // Super admin sees all cities
                 onSOSUpdated={(updatedAlerts) => setSOSAlerts(updatedAlerts)}
@@ -484,6 +533,7 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <GujaratCrimeMap
+                  key={`map-${refreshKey}`}
                   reports={allReports}
                   sosAlerts={sosAlerts}
                   onViewMore={handleViewMore}

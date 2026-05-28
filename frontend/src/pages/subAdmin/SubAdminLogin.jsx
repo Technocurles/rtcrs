@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import API from "../../config/api";
 
 export default function SubAdminLogin() {
   const navigate = useNavigate();
@@ -11,48 +10,25 @@ export default function SubAdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [checkingAuth, setCheckingAuth] = useState(true);
-
-// CRITICAL: Clear any existing subadmin sessions on mount to prevent unauthorized access
-  // This ensures a clean login state and prevents using old tokens from previous sessions
-  useEffect(() => {
-    // Clear ALL admin-related storage to ensure clean authentication
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminRole");
-    localStorage.removeItem("adminCity");
-    localStorage.removeItem("adminName");
-    sessionStorage.removeItem("subAdminToken");
-    localStorage.removeItem("subAdminToken");
-    localStorage.removeItem("subAdminId");
-    
-    // Mark checking as complete - do NOT auto-redirect
-    // Users must explicitly login with credentials
-    setCheckingAuth(false);
-  }, []);
+  // Auto redirect if already logged in
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail || !password.trim()) {
+    if (!email || !password) {
       return setError("All fields are required");
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      return setError("Please enter a valid email");
     }
 
     try {
       setLoading(true);
 
-      const res = await axios.post(`${API}/api/admin/login`, {
-        email: trimmedEmail,
-        password: password.trim(),
-      });
+      const API = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
-      if (res.data.role !== "sub_admin") {
-        return setError("This account is not a sub-admin account");
-      }
+      const res = await axios.post(`${API}/api/admin/login`, {
+        email,
+        password,
+      });
 
       // CRITICAL FIX: Use sessionStorage instead of localStorage for the token
       // sessionStorage is tab-specific (each tab has its own), so when a user logs in
@@ -97,8 +73,7 @@ export default function SubAdminLogin() {
         )}
 
         <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+
           <input
             type="email"
             placeholder="Enter Email"
@@ -107,10 +82,7 @@ export default function SubAdminLogin() {
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="off"
           />
-          </div>
 
-          <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Password</label>
           <input
             type="password"
             placeholder="Enter Password"
@@ -119,7 +91,6 @@ export default function SubAdminLogin() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="off"
           />
-          </div>
 
           <button
             type="submit"
@@ -128,7 +99,6 @@ export default function SubAdminLogin() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
-          
 
         </form>
       </div>
